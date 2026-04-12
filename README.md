@@ -56,7 +56,7 @@ agentcore add agent \
 agentcore deploy -y
 ```
 
-The generated [app/mcp_server_gateway/main.py](app/mcp_server_gateway/main.py) exposes the tools via FastMCP over streamable HTTP:
+The generated `app/mcp_server_gateway/main.py` exposes the tools via FastMCP over streamable HTTP:
 
 ```python
 from mcp.server.fastmcp import FastMCP
@@ -95,7 +95,7 @@ Before deploying, make sure OpenTelemetry is enabled — without it the containe
 },
 ```
 
-And add the required dependency to [app/mcp_server_gateway/pyproject.toml](app/mcp_server_gateway/pyproject.toml):
+And add the required dependency to `app/mcp_server_gateway/pyproject.toml`:
 
 ```toml
 dependencies = [
@@ -207,7 +207,7 @@ agentcore add agent \
   --memory none
 ```
 
-The CLI generates [app/agent_gateway/mcp_client/client.py](app/agent_gateway/mcp_client/client.py), which reads the gateway URL from an environment variable and signs requests with AWS IAM (`aws_iam_streamablehttp_client`). Under the hood, AWS automatically signs every outbound request using [AWS Signature Version 4 (SigV4)](https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html) — no manual signing is required.
+The CLI generates `app/agent_gateway/mcp_client/client.py`, which reads the gateway URL from an environment variable and signs requests with AWS IAM (`aws_iam_streamablehttp_client`). Under the hood, AWS automatically signs every outbound request using [AWS Signature Version 4 (SigV4)](https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html) — no manual signing is required.
 
 ```python
 from mcp_proxy_for_aws.client import aws_iam_streamablehttp_client
