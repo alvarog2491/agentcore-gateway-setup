@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__bedrock-agentcore-mcp-server__search_agentcore_docs",
+      "mcp__bedrock-agentcore-mcp-server__fetch_agentcore_doc",
+      "Bash(.venv/bin/python -c \"from mcp.shared.memory import create_connected_server_and_client_session; help\\(create_connected_server_and_client_session\\)\")",
+      "Bash(.venv/bin/pip show:*)",
+      "Bash(.venv/bin/pip install:*)",
+      "Bash(.venv/bin/pytest tests/test_mcp_server.py -v)",
+      "Bash(poetry run:*)",
+      "Bash(python check.py)",
+      "mcp__bedrock-agentcore-mcp-server__browser_evaluate",
+      "mcp__bedrock-agentcore-mcp-server__stop_browser_session",
+      "Bash(aws logs:*)",
+      "mcp__bedrock-agentcore-mcp-server__manage_agentcore_gateway"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "bedrock-agentcore-mcp-server"
+  ]
+}

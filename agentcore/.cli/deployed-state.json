@@ -1,3 +1,17 @@
 {
-  "targets": {}
+  "targets": {
+    "default": {
+      "resources": {
+        "runtimes": {
+          "mcp_server_gateway": {
+            "runtimeId": "Project_mcp_server_gateway-XPpNYC576F",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:026898548947:runtime/Project_mcp_server_gateway-XPpNYC576F",
+            "roleArn": "arn:aws:iam::026898548947:role/AgentCore-Project-default-ApplicationAgentMcpServer-Zjcmwpcgi9Yb"
+          }
+        },
+        "stackName": "AgentCore-Project-default",
+        "identityKmsKeyArn": "arn:aws:kms:us-east-1:026898548947:key/1a1f19f3-96fb-43c8-a5c3-c67b88bd6eef"
+      }
+    }
+  }
 }

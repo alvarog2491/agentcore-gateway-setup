@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "mcp__bedrock-agentcore-mcp-server__start_browser_session",
+      "mcp__bedrock-agentcore-mcp-server__browser_navigate"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/alvaro/VSProjects/agentrep/agentrep-worker/.claude/hooks/check_readme.py"
+          }
+        ]
+      }
+    ]
+  }
+}

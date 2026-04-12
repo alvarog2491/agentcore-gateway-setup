@@ -1,27 +1,58 @@
 {
   "$schema": "https://schema.agentcore.aws.dev/v1/agentcore.json",
-  "name": "gatewaytest",
+  "name": "Project",
   "version": 1,
   "managedBy": "CDK",
   "tags": {
     "agentcore:created-by": "agentcore-cli",
-    "agentcore:project-name": "gatewaytest"
+    "agentcore:project-name": "Project"
   },
   "runtimes": [
     {
-      "name": "MyAgent",
+      "name": "mcp_server_gateway",
       "build": "Container",
       "entrypoint": "main.py",
-      "codeLocation": "app/MyAgent/",
+      "codeLocation": "app/mcp_server_gateway/",
       "runtimeVersion": "PYTHON_3_13",
       "networkMode": "PUBLIC",
-      "protocol": "HTTP"
+      "instrumentation": {
+        "enableOtel": true
+      },
+      "protocol": "MCP",
+      "authorizerType": "AWS_IAM"
     }
   ],
   "memories": [],
   "credentials": [],
   "evaluators": [],
   "onlineEvalConfigs": [],
-  "agentCoreGateways": [],
+  "agentCoreGateways": [
+    {
+      "name": "my-gateway",
+      "description": "Gateway for my-gateway",
+      "targets": [
+        {
+          "name": "mytool",
+          "targetType": "mcpServer",
+          "toolDefinitions": [
+            {
+              "name": "mytool",
+              "description": "Tool for mytool",
+              "inputSchema": {
+                "type": "object"
+              }
+            }
+          ],
+          "endpoint": "https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-agentcore%3Aus-east-1%3A026898548947%3Aruntime%2FProject_mcp_server_gateway-XPpNYC576F/invocations?qualifier=DEFAULT",
+          "outboundAuth": {
+            "type": "NONE"
+          }
+        }
+      ],
+      "authorizerType": "AWS_IAM",
+      "enableSemanticSearch": true,
+      "exceptionLevel": "NONE"
+    }
+  ],
   "policyEngines": []
 }

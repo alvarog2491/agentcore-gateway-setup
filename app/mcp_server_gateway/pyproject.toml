@@ -3,18 +3,14 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "MyAgent"
+name = "mcp_server_gateway"
 version = "0.1.0"
-description = "AgentCore Runtime Application using Strands SDK"
+description = "AgentCore MCP Server"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "aws-opentelemetry-distro",
-    "bedrock-agentcore >= 1.0.3",
-    "botocore[crt] >= 1.35.0",
+    "aws-opentelemetry-distro >= 0.17.0",
     "mcp >= 1.19.0",
-    "strands-agents >= 1.13.0",
-    
 ]
 
 [tool.hatch.build.targets.wheel]
