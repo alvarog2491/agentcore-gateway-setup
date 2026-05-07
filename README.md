@@ -120,6 +120,8 @@ arn:aws:bedrock-agentcore:<region>:<account-id>:runtime/Project_mcp_server_gatew
 
 ### Step 2 — Create the AgentCore Gateway
 
+> **CLI limitation (agentcore CLI v0.8.0, April 2026):** Creating a gateway with **`AWS_IAM` authorizer type** is not yet supported via non-interactive CLI flags. It can be completed through the CLI TUI (`agentcore add`), the AWS Console, or directly in CDK. This issue has been reported at: https://github.com/aws/agentcore-cli/issues/819
+
 Create a gateway with **AWS IAM** as the inbound authorizer and **Semantic Search** enabled so the agent can discover tools by natural language description.
 
 ```bash
@@ -143,9 +145,9 @@ https://project-my-gateway-<suffix>.gateway.bedrock-agentcore.<region>.amazonaws
 
 ---
 
-### Step 3 — Add the MCP Server as a Gateway Target (AWS Console)
+### Step 3 — Add the MCP Server as a Gateway Target
 
-> **CLI limitation (agentcore CLI v0.8.0, April 2026):** Creating a gateway target with **IAM Role outbound authentication** is not yet supported by the CLI. This step must be completed in the AWS Console. This issue has been reported at: https://github.com/aws/agentcore-cli/issues/819
+> The agentcore CLI does not yet support deploying gateway targets with **IAM outbound authentication** pointing to resources already defined in `agentcore.json` as target endpoints. Use the **AWS Console** (described below) or **AgentCore CDK** (see Step 3 Alternative) to complete this step.
 
 Navigate to **Amazon Bedrock → AgentCore → Gateways → `my-gateway` → Add target** and configure:
 
@@ -189,6 +191,76 @@ https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-a
 ```
 
 Replace `<region>`, `<account-id>`, and `<suffix>` with your actual values from Step 1.
+
+---
+
+### Step 3 (Alternative) — Add the Gateway Target via AgentCore CDK
+
+Gateway targets can also be declared in code when using the **AgentCore CDK** library. The snippet below is a reference template:
+
+```typescript
+function addGatewayTarget(
+  scope: Construct,
+  agentCoreMcp: AgentCoreMcp,
+  application: AgentCoreApplication,
+  instanceSuffix: string,
+): void {
+  const runtimeEnv = application.environments.get(`myRuntime${instanceSuffix}`)
+  const cfnGateway = agentCoreMcp.gateways.get(`my-gateway-${instanceSuffix}`)
+
+  if (!runtimeEnv || !cfnGateway) return
+
+  const runtimeArn = runtimeEnv.runtime.runtimeArn
+
+  // URL-encode the runtime ARN (getRuntimeEndpointUrl is not yet publicly exported).
+  const colonReplaced = Fn.join('%3A', Fn.split(':', runtimeArn))
+  const encodedArn = Fn.join('%2F', Fn.split('/', colonReplaced))
+  const endpointUrl = Fn.sub(
+    'https://bedrock-agentcore.${AWS::Region}.amazonaws.com/runtimes/${EncodedArn}/invocations?qualifier=DEFAULT',
+    { EncodedArn: encodedArn },
+  )
+
+  // Look up the gateway execution role using the same ID scheme AgentCoreMcp uses internally.
+  const gatewayRole = agentCoreMcp.node
+    .findChild(toPascalId('Gateway', `my-gateway-${instanceSuffix}`))
+    .node.findChild('Role') as iam.IRole
+
+  // Grant invoke on the base ARN and on the /runtime-endpoint/DEFAULT sub-resource.
+  runtimeEnv.runtime.grantInvoke(gatewayRole)
+  iam.Grant.addToPrincipal({
+    grantee: gatewayRole,
+    actions: ['bedrock-agentcore:InvokeAgentRuntime'],
+    resourceArns: [Fn.join('', [runtimeArn, '/runtime-endpoint/DEFAULT'])],
+  })
+
+  const cfnTarget = new bedrockagentcore.CfnGatewayTarget(scope, 'MyGatewayTarget', {
+    name: 'myTarget',
+    gatewayIdentifier: cfnGateway.attrGatewayIdentifier,
+    targetConfiguration: {
+      mcp: {
+        mcpServer: {
+          endpoint: endpointUrl,
+        },
+      },
+    },
+  })
+
+  // IamCredentialProvider is not yet modelled in the L1 type — use a raw override.
+  cfnTarget.addPropertyOverride('CredentialProviderConfigurations', [
+    {
+      CredentialProviderType: 'GATEWAY_IAM_ROLE',
+      CredentialProvider: {
+        IamCredentialProvider: {
+          Service: 'bedrock-agentcore',
+        },
+      },
+    },
+  ])
+
+  cfnTarget.node.addDependency(gatewayRole)
+  cfnTarget.node.addDependency(cfnGateway)
+}
+```
 
 ---
 
